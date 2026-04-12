@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dinas Ketahanan Pangan Provinsi Sumatera Utara</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#f5f5f5}
+
+/* HEADER */
+.header{
+  display:flex;gap:20px;align-items:center;
+  padding:20px;background:#fff
+}
+.header img{height:80px}
+.header h1{margin:0;font-size:20px;color:#1b5e20}
+.header h2{margin:0;font-size:16px;color:#555}
+
+@media(max-width:900px){
+  .wrapper{
+    grid-template-columns:1fr;
+  }
+
+  #slide,
+  #video{
+    height:300px;
+  }
+}
+
+/* LAYOUT */
+.wrapper{
+  display:grid;
+  grid-template-columns:1fr 3fr;
+  gap:30px;
+  padding:30px;
+}
+.box{
+  background:#fff;border-radius:6px;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+  overflow:hidden
+}
+.box h3{margin:0;padding:10px;background:#4caf50;color:#fff}
+
+/* SLIDE */
+#slide{
+  height:500px;
+  background:#eee;
+}
+
+.slide-img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* VIDEO */
+#video{
+  height:500px;
+  background:#000;
+}
+
+
+/* RUNNING TEXT */
+marquee{background:#ffd700;padding:10px;font-weight:bold;color:#1b5e20}
+
+@media(max-width:900px){
+  .wrapper{grid-template-columns:1fr}
+}
+</style>
+
+<!-- YOUTUBE API (WAJIB) -->
+<script src="https://www.youtube.com/iframe_api"></script>
+</head>
+
+<body>
+
+<div class="header">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/d/db/LOGO-PROVINSI-SUMATERA-UTARA.png">
+  <div>
+    <h1>DINAS KETAHANAN PANGAN, TANAMAN PANGAN DAN HORTIKULTURA</h1>
+    <h2>PROVINSI SUMATERA UTARA</h2>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <div class="box">
+    <h3>Galeri Kegiatan</h3>
+    <div id="slide">Belum ada foto</div>
+  </div>
+
+  <div class="box">
+    <h3>Video Profil / Kegiatan</h3>
+    <div id="video"></div>
+  </div>
+
+</div>
+
+<marquee id="runningText"></marquee>
+
+<script>
+/* ======================
+   GLOBAL
+====================== */
+let slides = [], slideIndex = 0;
+let videos = [], videoIndex = 0;
+let player;
+let ytReady = false;
+
+/* ======================
+   YOUTUBE READY
+====================== */
+function onYouTubeIframeAPIReady() {
+  ytReady = true;
+}
+
+/* ======================
+   HELPER
+====================== */
+function getYoutubeId(url) {
+  if (url.includes('youtu.be/'))
+    return url.split('youtu.be/')[1].split('?')[0];
+  if (url.includes('watch?v='))
+    return url.split('watch?v=')[1].split('&')[0];
+  return '';
+}
+
+/* ======================
+   SLIDESHOW
+====================== */
+function startSlideshow() {
+  if (!slides.length) return;
+  document.getElementById('slide').innerHTML =
+    `<img class="slide-img" src="${slides[slideIndex]}">`;
+  slideIndex = (slideIndex + 1) % slides.length;
+  setTimeout(startSlideshow, 4000);
+}
+
+/* ======================
+   VIDEO PLAYER
+====================== */
+function playVideo() {
+  const area = document.getElementById('video');
+  area.innerHTML = '';
+
+  if (!videos.length) {
+    area.innerHTML = "<div style='color:#fff;padding:20px'>Belum ada video</div>";
+    return;
+  }
+
+  const v = videos[videoIndex];
+
+  // YouTube Video
+  if (v.startsWith('http')) {
+    if (!ytReady) {
+      setTimeout(playVideo, 500);
+      return;
+    }
+
+    area.innerHTML = `<div id="ytplayer"></div>`;
+    player = new YT.Player('ytplayer', {
+      width: '100%',
+      height: '100%',
+      videoId: getYoutubeId(v),
+      playerVars: {
+        autoplay: 1,
+        rel: 0,
+        mute: 0,       // Suara langsung nyala
+        controls: 1
+      },
+      events: {
+        onReady: (e) => {
+          // Autoplay dengan suara jika browser izinkan
+          e.target.playVideo().catch(() => {
+            // Jika browser blok autoplay suara, mute dulu
+            e.target.mute();
+            e.target.playVideo();
+          });
+        },
+        onStateChange: (e) => {
+          if (e.data === YT.PlayerState.ENDED) {
+            nextVideo();
+          }
+        }
+      }
+    });
+  } 
+  // MP4 Video
+  else {
+    area.innerHTML = `
+      <video autoplay controls style="width:100%;height:100%" onended="nextVideo()">
+        <source src="/uploads/${v}" type="video/mp4">
+      </video>
+    `;
+    // Pastikan autoplay suara aktif
+    const vid = area.querySelector('video');
+    vid.muted = false;
+    vid.play().catch(() => {
+      vid.muted = true; // fallback jika autoplay diblok
+      vid.play();
+    });
+  }
+}
+
+function nextVideo() {
+  videoIndex = (videoIndex + 1) % videos.length;
+  playVideo();
+}
+
+/* ======================
+   LOAD DATA
+====================== */
+fetch('/api/data')
+  .then(r => r.json())
+  .then(d => {
+    document.getElementById('runningText').innerText = d.runningText || '';
+
+    if (d.slideshow) {
+      slides = d.slideshow.map(s => s.startsWith('http') ? s : '/uploads/' + s);
+      startSlideshow();
+    }
+
+    videos = d.videoList || [];
+    playVideo();
+  });
+</script>
+
+
+</body>
+</html>
