@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Admin - Dinas Pertanian</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #1b5e20; }
+        .login-box { background: white; padding: 30px; border-radius: 8px; width: 300px; text-align: center; }
+        h2 { color: #1b5e20; margin-bottom: 20px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; background: #2e7d32; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        button:hover { background: #1b5e20; }
+        #error { color: red; font-size: 0.8rem; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>LOGIN ADMIN</h2>
+        <input type="text" id="user" placeholder="Username">
+        <input type="password" id="pass" placeholder="Password">
+        <button onclick="doLogin()">Masuk</button>
+        <p id="error"></p>
+    </div>
+
+    <script>
+        function doLogin() {
+            const username = document.getElementById('user').value;
+            const password = document.getElementById('pass').value;
+
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    window.location.href = '/admin.html';
+                } else {
+                    document.getElementById('error').innerText = res.message;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

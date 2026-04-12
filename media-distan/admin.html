@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Admin Media</title>
+<style>
+body{
+  font-family:Segoe UI, Arial, sans-serif;
+  background:#f4f6f8;
+  margin:0;
+}
+.container{
+  max-width:900px;
+  margin:30px auto;
+  background:#fff;
+  padding:25px;
+  border-radius:8px;
+  box-shadow:0 4px 12px rgba(0,0,0,.1);
+}
+h2{margin-top:0;color:#2e7d32}
+h3{
+  border-left:5px solid #2e7d32;
+  padding-left:10px;
+  margin-top:30px;
+}
+input[type=text],input[type=file]{
+  width:100%;
+  padding:8px;
+  margin:6px 0 10px;
+}
+button{
+  padding:8px 14px;
+  border:none;
+  border-radius:4px;
+  cursor:pointer;
+  font-size:14px;
+}
+.btn-add{background:#1976d2;color:#fff}
+.btn-save{background:#2e7d32;color:#fff;margin-top:20px}
+.btn-del{background:#d32f2f;color:#fff}
+
+.list{
+  border:1px solid #ddd;
+  border-radius:4px;
+  padding:10px;
+  margin-bottom:20px;
+}
+.item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px dashed #ccc;
+  padding:6px 0;
+  font-size:13px;
+}
+.item:last-child{border-bottom:none}
+small{color:#666}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>ADMIN MEDIA</h2>
+
+  <!-- RUNNING TEXT -->
+  <h3>Running Text</h3>
+  <input type="text" id="rt" placeholder="Teks berjalan di website">
+
+  <!-- VIDEO YOUTUBE -->
+  <h3>Tambah Video YouTube</h3>
+  <input type="text" id="yt" placeholder="https://youtu.be/xxxx">
+  <button class="btn-add" onclick="addYT()">Tambah Video</button>
+
+  <!-- UPLOAD FILE -->
+  <h3>Upload Foto / Video</h3>
+  <input type="file" id="file">
+  <button class="btn-add" onclick="upload()">Upload File</button>
+
+  <!-- FOTO LINK -->
+  <h3>Tambah Foto via Link</h3>
+  <input type="text" id="fotoLink" placeholder="https://example.com/foto.jpg">
+  <button class="btn-add" onclick="addFotoLink()">Tambah Foto</button>
+
+  <!-- LIST VIDEO -->
+  <h3>Daftar Video</h3>
+  <div class="list" id="videoList"></div>
+
+  <!-- LIST FOTO -->
+  <h3>Daftar Foto</h3>
+  <div class="list" id="fotoList"></div>
+
+  <button class="btn-save" onclick="save()">💾 Simpan Semua</button>
+</div>
+
+<script>
+let data = {
+  runningText:"",
+  videoList:[],
+  slideshow:[],
+  berita:[]
+};
+
+// LOAD DATA
+fetch('/api/data')
+.then(r=>r.json())
+.then(d=>{
+  data = d;
+  rt.value = d.runningText || "";
+  render();
+});
+
+// RENDER LIST
+function render(){
+  videoList.innerHTML = data.videoList.length
+    ? data.videoList.map((v,i)=>`
+        <div class="item">
+          <div>
+            ${v.startsWith('http') ? '▶️ YouTube' : '🎬 MP4'}
+            <br><small>${v}</small>
+          </div>
+          <button class="btn-del" onclick="delVideo(${i})">Hapus</button>
+        </div>
+      `).join('')
+    : "<small>Belum ada video</small>";
+
+  fotoList.innerHTML = data.slideshow.length
+    ? data.slideshow.map((f,i)=>`
+        <div class="item">
+          <div>🖼 <small>${f}</small></div>
+          <button class="btn-del" onclick="delFoto(${i})">Hapus</button>
+        </div>
+      `).join('')
+    : "<small>Belum ada foto</small>";
+}
+
+// TAMBAH YOUTUBE
+function addYT(){
+  if(!yt.value) return alert("Link kosong");
+
+  data.videoList.push(yt.value.trim());
+  yt.value="";
+  render();
+  autoSave(); // ✅
+}
+
+
+// UPLOAD FILE
+function upload(){
+  if(!file.files.length) return alert("Pilih file dulu");
+  const f = file.files[0];
+  const fd = new FormData();
+  fd.append('file', f);
+
+  fetch('/api/upload', { method:'POST', body:fd })
+  .then(r=>r.json())
+  .then(r=>{
+    if(f.type.startsWith('image'))
+      data.slideshow.push(r.file);
+    else
+      data.videoList.push(r.file);
+
+    render();
+    autoSave(); // ✅ SIMPAN OTOMATIS
+  });
+}
+
+
+// TAMBAH FOTO VIA LINK
+function addFotoLink(){
+  const link = fotoLink.value.trim();
+  if(!link) return alert("Link kosong");
+
+  data.slideshow.push(link);
+  fotoLink.value="";
+  render();
+  autoSave(); // ✅
+}
+
+
+// DELETE
+function delFoto(i){
+  data.slideshow.splice(i,1);
+  render();
+  autoSave(); // ✅
+}
+function delVideo(i){
+  data.videoList.splice(i,1);
+  render();
+  autoSave(); // ✅
+}
+
+
+function autoSave(){
+  fetch('/api/update',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(data)
+  });
+}
+
+
+// SAVE
+function save(){
+  data.runningText = rt.value;
+  fetch('/api/update',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(data)
+  }).then(()=>alert("Data berhasil disimpan"));
+}
+</script>
+
+</body>
+</html>
