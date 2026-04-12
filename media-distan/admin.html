@@ -1,213 +1,105 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Admin Media</title>
-<style>
-body{
-  font-family:Segoe UI, Arial, sans-serif;
-  background:#f4f6f8;
-  margin:0;
-}
-.container{
-  max-width:900px;
-  margin:30px auto;
-  background:#fff;
-  padding:25px;
-  border-radius:8px;
-  box-shadow:0 4px 12px rgba(0,0,0,.1);
-}
-h2{margin-top:0;color:#2e7d32}
-h3{
-  border-left:5px solid #2e7d32;
-  padding-left:10px;
-  margin-top:30px;
-}
-input[type=text],input[type=file]{
-  width:100%;
-  padding:8px;
-  margin:6px 0 10px;
-}
-button{
-  padding:8px 14px;
-  border:none;
-  border-radius:4px;
-  cursor:pointer;
-  font-size:14px;
-}
-.btn-add{background:#1976d2;color:#fff}
-.btn-save{background:#2e7d32;color:#fff;margin-top:20px}
-.btn-del{background:#d32f2f;color:#fff}
-
-.list{
-  border:1px solid #ddd;
-  border-radius:4px;
-  padding:10px;
-  margin-bottom:20px;
-}
-.item{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:1px dashed #ccc;
-  padding:6px 0;
-  font-size:13px;
-}
-.item:last-child{border-bottom:none}
-small{color:#666}
-</style>
+    <meta charset="UTF-8">
+    <title>Admin Media - Manual Mode</title>
+    <style>
+        body { font-family: Segoe UI, Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+        h2 { color: #2e7d32; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; }
+        h3 { margin-top: 20px; font-size: 16px; color: #333; }
+        input[type=text] { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-add { background: #1976d2; color: #fff; }
+        .btn-del { background: #d32f2f; color: #fff; padding: 5px 10px; }
+        .list { border: 1px solid #eee; padding: 10px; margin-top: 10px; background: #fafafa; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; font-size: 13px; }
+        #output-area { margin-top: 30px; background: #fffbe6; padding: 15px; border: 1px dashed #ffa940; }
+        textarea { width: 100%; height: 150px; font-family: monospace; margin-top: 10px; }
+        .copy-hint { background: #2e7d32; color: white; padding: 10px; border-radius: 4px; margin-bottom: 10px; }
+    </style>
 </head>
 <body>
 
 <div class="container">
-  <h2>ADMIN MEDIA</h2>
+    <h2>ADMIN PANEL (MANUAL)</h2>
+    <p>Karena GitHub bersifat statis, gunakan panel ini untuk merakit data, lalu copy hasilnya ke data.json.</p>
 
-  <!-- RUNNING TEXT -->
-  <h3>Running Text</h3>
-  <input type="text" id="rt" placeholder="Teks berjalan di website">
+    <h3>1. Running Text</h3>
+    <input type="text" id="rtInput" placeholder="Masukkan teks berjalan...">
 
-  <!-- VIDEO YOUTUBE -->
-  <h3>Tambah Video YouTube</h3>
-  <input type="text" id="yt" placeholder="https://youtu.be/xxxx">
-  <button class="btn-add" onclick="addYT()">Tambah Video</button>
+    <h3>2. Video YouTube</h3>
+    <input type="text" id="ytInput" placeholder="Contoh: https://www.youtube.com/watch?v=xxxx">
+    <button class="btn-add" onclick="addYT()">+ Tambah Video</button>
+    <div class="list" id="vList"></div>
 
-  <!-- UPLOAD FILE -->
-  <h3>Upload Foto / Video</h3>
-  <input type="file" id="file">
-  <button class="btn-add" onclick="upload()">Upload File</button>
+    <h3>3. Foto (Link / Nama File)</h3>
+    <input type="text" id="fInput" placeholder="Contoh: foto1.jpg atau link https://...">
+    <button class="btn-add" onclick="addFoto()">+ Tambah Foto</button>
+    <div class="list" id="fList"></div>
 
-  <!-- FOTO LINK -->
-  <h3>Tambah Foto via Link</h3>
-  <input type="text" id="fotoLink" placeholder="https://example.com/foto.jpg">
-  <button class="btn-add" onclick="addFotoLink()">Tambah Foto</button>
-
-  <!-- LIST VIDEO -->
-  <h3>Daftar Video</h3>
-  <div class="list" id="videoList"></div>
-
-  <!-- LIST FOTO -->
-  <h3>Daftar Foto</h3>
-  <div class="list" id="fotoList"></div>
-
-  <button class="btn-save" onclick="save()">💾 Simpan Semua</button>
+    <div id="output-area">
+        <div class="copy-hint">✅ <b>Langkah Terakhir:</b> Klik tombol di bawah, lalu Copy semua kode di kotak kuning dan Paste ke file <b>data.json</b> Anda di GitHub.</div>
+        <button style="background: #f50; color: #fff; width: 100%; font-size: 18px;" onclick="generateJSON()">GENERATE DATA.JSON</button>
+        <textarea id="jsonResult" readonly placeholder="Hasil kode akan muncul di sini..."></textarea>
+    </div>
 </div>
 
 <script>
-let data = {
-  runningText:"",
-  videoList:[],
-  slideshow:[],
-  berita:[]
-};
+    let data = {
+        runningText: "",
+        videoList: [],
+        slideshow: [],
+        berita: []
+    };
 
-// LOAD DATA
-fetch('/api/data')
-.then(r=>r.json())
-.then(d=>{
-  data = d;
-  rt.value = d.runningText || "";
-  render();
-});
+    // Load data lama jika ada
+    fetch('data.json')
+        .then(r => r.json())
+        .then(d => {
+            data = d;
+            document.getElementById('rtInput').value = d.runningText || "";
+            render();
+        }).catch(e => console.log("Belum ada data.json"));
 
-// RENDER LIST
-function render(){
-  videoList.innerHTML = data.videoList.length
-    ? data.videoList.map((v,i)=>`
-        <div class="item">
-          <div>
-            ${v.startsWith('http') ? '▶️ YouTube' : '🎬 MP4'}
-            <br><small>${v}</small>
-          </div>
-          <button class="btn-del" onclick="delVideo(${i})">Hapus</button>
-        </div>
-      `).join('')
-    : "<small>Belum ada video</small>";
+    function render() {
+        const vDiv = document.getElementById('vList');
+        vDiv.innerHTML = data.videoList.map((v, i) => `
+            <div class="item">
+                <span>${v}</span>
+                <button class="btn-del" onclick="delVideo(${i})">Hapus</button>
+            </div>
+        `).join('') || "<small>Tidak ada video</small>";
 
-  fotoList.innerHTML = data.slideshow.length
-    ? data.slideshow.map((f,i)=>`
-        <div class="item">
-          <div>🖼 <small>${f}</small></div>
-          <button class="btn-del" onclick="delFoto(${i})">Hapus</button>
-        </div>
-      `).join('')
-    : "<small>Belum ada foto</small>";
-}
+        const fDiv = document.getElementById('fList');
+        fDiv.innerHTML = data.slideshow.map((f, i) => `
+            <div class="item">
+                <span>${f}</span>
+                <button class="btn-del" onclick="delFoto(${i})">Hapus</button>
+            </div>
+        `).join('') || "<small>Tidak ada foto</small>";
+    }
 
-// TAMBAH YOUTUBE
-function addYT(){
-  if(!yt.value) return alert("Link kosong");
+    function addYT() {
+        const val = document.getElementById('ytInput').value;
+        if(val) { data.videoList.push(val); document.getElementById('ytInput').value = ""; render(); }
+    }
 
-  data.videoList.push(yt.value.trim());
-  yt.value="";
-  render();
-  autoSave(); // ✅
-}
+    function addFoto() {
+        const val = document.getElementById('fInput').value;
+        if(val) { data.slideshow.push(val); document.getElementById('fInput').value = ""; render(); }
+    }
 
+    function delVideo(i) { data.videoList.splice(i, 1); render(); }
+    function delFoto(i) { data.slideshow.splice(i, 1); render(); }
 
-// UPLOAD FILE
-function upload(){
-  if(!file.files.length) return alert("Pilih file dulu");
-  const f = file.files[0];
-  const fd = new FormData();
-  fd.append('file', f);
-
-  fetch('/api/upload', { method:'POST', body:fd })
-  .then(r=>r.json())
-  .then(r=>{
-    if(f.type.startsWith('image'))
-      data.slideshow.push(r.file);
-    else
-      data.videoList.push(r.file);
-
-    render();
-    autoSave(); // ✅ SIMPAN OTOMATIS
-  });
-}
-
-
-// TAMBAH FOTO VIA LINK
-function addFotoLink(){
-  const link = fotoLink.value.trim();
-  if(!link) return alert("Link kosong");
-
-  data.slideshow.push(link);
-  fotoLink.value="";
-  render();
-  autoSave(); // ✅
-}
-
-
-// DELETE
-function delFoto(i){
-  data.slideshow.splice(i,1);
-  render();
-  autoSave(); // ✅
-}
-function delVideo(i){
-  data.videoList.splice(i,1);
-  render();
-  autoSave(); // ✅
-}
-
-
-function autoSave(){
-  fetch('/api/update',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(data)
-  });
-}
-
-
-// SAVE
-function save(){
-  data.runningText = rt.value;
-  fetch('/api/update',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(data)
-  }).then(()=>alert("Data berhasil disimpan"));
-}
+    function generateJSON() {
+        data.runningText = document.getElementById('rtInput').value;
+        const result = JSON.stringify(data, null, 2);
+        document.getElementById('jsonResult').value = result;
+        document.getElementById('jsonResult').select();
+        alert("Kode berhasil dibuat! Silakan Copy kode yang terpilih.");
+    }
 </script>
 
 </body>
