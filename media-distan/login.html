@@ -22,25 +22,20 @@
         <p id="error"></p>
     </div>
 
-    <script>
-        function doLogin() {
-            const username = document.getElementById('user').value;
-            const password = document.getElementById('pass').value;
+<script>
+    function doLogin() {
+        const username = document.getElementById('user').value;
+        const password = document.getElementById('pass').value;
 
-            fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) {
-                    window.location.href = '/admin.html';
-                } else {
-                    document.getElementById('error').innerText = res.message;
-                }
-            });
+        // TENTUKAN USERNAME & PASSWORD DI SINI (Contoh: admin / 12345)
+        if (username === "admin" && password === "12345") {
+            // Jika benar, langsung pindah ke halaman admin
+            window.location.href = 'admin.html';
+        } else {
+            // Jika salah, tampilkan pesan error
+            document.getElementById('error').innerText = "Username atau Password Salah!";
         }
-    </script>
+    }
+</script>
 </body>
 </html>
