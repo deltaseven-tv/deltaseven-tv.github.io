@@ -69,7 +69,7 @@
         }
     }
 
-    function playVideo() {
+function playVideo() {
         const container = document.getElementById('video');
         const vUrl = videos[videoIndex];
         const vId = getYoutubeId(vUrl);
@@ -87,7 +87,8 @@
             videoId: vId,
             playerVars: {
                 'autoplay': 1,
-                'mute': 1, // Mute wajib agar bisa autoplay di Chrome
+                // Video pertama (index 0) wajib mute (1), video selanjutnya bersuara (0)
+                'mute': (videoIndex === 0) ? 1 : 0, 
                 'controls': 1,
                 'rel': 0,
                 'modestbranding': 1
@@ -95,17 +96,21 @@
             events: {
                 'onReady': (event) => {
                     event.target.playVideo();
+                    // Jika bukan video pertama, pastikan suara menyala
+                    if (videoIndex > 0) {
+                        event.target.unMute();
+                        event.target.setVolume(80); // Set volume ke 80%
+                    }
                 },
                 'onStateChange': (event) => {
                     if (event.data === YT.PlayerState.ENDED) {
                         videoIndex = (videoIndex + 1) % videos.length;
-                        playVideo();
+                        playVideo(); // Putar video berikutnya
                     }
                 }
             }
         });
     }
-
     function startSlideshow() {
         if (slides.length === 0) return;
         const container = document.getElementById('slide');
