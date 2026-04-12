@@ -1,231 +1,236 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dinas Ketahanan Pangan Provinsi Sumatera Utara</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinas Ketahanan Pangan Provinsi Sumatera Utara</title>
 
-<style>
-body{margin:0;font-family:Arial;background:#f5f5f5}
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; color: #333; }
 
-/* HEADER */
-.header{
-  display:flex;gap:20px;align-items:center;
-  padding:20px;background:#fff
-}
-.header img{height:80px}
-.header h1{margin:0;font-size:20px;color:#1b5e20}
-.header h2{margin:0;font-size:16px;color:#555}
+        /* HEADER */
+        .header {
+            display: flex; gap: 20px; align-items: center;
+            padding: 20px; background: #fff; border-bottom: 4px solid #1b5e20;
+        }
+        .header img { height: 80px; }
+        .header h1 { margin: 0; font-size: 20px; color: #1b5e20; text-transform: uppercase; }
+        .header h2 { margin: 0; font-size: 16px; color: #555; }
 
-@media(max-width:900px){
-  .wrapper{
-    grid-template-columns:1fr;
-  }
+        /* LAYOUT */
+        .wrapper {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-  #slide,
-  #video{
-    height:300px;
-  }
-}
+        .box {
+            background: #fff; border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
 
-/* LAYOUT */
-.wrapper{
-  display:grid;
-  grid-template-columns:1fr 3fr;
-  gap:30px;
-  padding:30px;
-}
-.box{
-  background:#fff;border-radius:6px;
-  box-shadow:0 2px 8px rgba(0,0,0,.1);
-  overflow:hidden
-}
-.box h3{margin:0;padding:10px;background:#4caf50;color:#fff}
+        .box h3 { margin: 0; padding: 15px; background: #4caf50; color: #fff; font-size: 18px; }
 
-/* SLIDE */
-#slide{
-  height:500px;
-  background:#eee;
-}
+        /* SLIDE */
+        #slide {
+            height: 450px;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.slide-img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
+        .slide-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.5s ease-in-out;
+        }
 
-/* VIDEO */
-#video{
-  height:500px;
-  background:#000;
-}
+        /* VIDEO */
+        #video {
+            height: 450px;
+            background: #000;
+        }
 
+        /* RUNNING TEXT */
+        .footer-marquee {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #ffd700;
+            color: #1b5e20;
+            padding: 12px 0;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-top: 2px solid #1b5e20;
+            z-index: 100;
+        }
 
-/* RUNNING TEXT */
-marquee{background:#ffd700;padding:10px;font-weight:bold;color:#1b5e20}
+        marquee { display: block; }
 
-@media(max-width:900px){
-  .wrapper{grid-template-columns:1fr}
-}
-</style>
+        /* RESPONSIVE */
+        @media(max-width:900px){
+            .wrapper { grid-template-columns: 1fr; padding: 10px; }
+            #slide, #video { height: 300px; }
+            .header h1 { font-size: 16px; }
+        }
+    </style>
 
-<!-- YOUTUBE API (WAJIB) -->
-<script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 
 <body>
 
 <div class="header">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/d/db/LOGO-PROVINSI-SUMATERA-UTARA.png">
-  <div>
-    <h1>DINAS KETAHANAN PANGAN, TANAMAN PANGAN DAN HORTIKULTURA</h1>
-    <h2>PROVINSI SUMATERA UTARA</h2>
-  </div>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/d/db/LOGO-PROVINSI-SUMATERA-UTARA.png" alt="Logo Sumut">
+    <div>
+        <h1>Dinas Ketahanan Pangan, Tanaman Pangan dan Hortikultura</h1>
+        <h2>Provinsi Sumatera Utara</h2>
+    </div>
 </div>
 
 <div class="wrapper">
+    <div class="box">
+        <h3>Galeri Kegiatan</h3>
+        <div id="slide">Memuat foto...</div>
+    </div>
 
-  <div class="box">
-    <h3>Galeri Kegiatan</h3>
-    <div id="slide">Belum ada foto</div>
-  </div>
-
-  <div class="box">
-    <h3>Video Profil / Kegiatan</h3>
-    <div id="video"></div>
-  </div>
-
+    <div class="box">
+        <h3>Video Profil / Kegiatan</h3>
+        <div id="video"></div>
+    </div>
 </div>
 
-<marquee id="runningText"></marquee>
+<div class="footer-marquee">
+    <marquee id="runningText">Memuat informasi...</marquee>
+</div>
 
 <script>
-/* ======================
-   GLOBAL
-====================== */
-let slides = [], slideIndex = 0;
-let videos = [], videoIndex = 0;
-let player;
-let ytReady = false;
+    /* ======================
+       GLOBAL VARIABLES
+    ====================== */
+    let slides = [], slideIndex = 0;
+    let videos = [], videoIndex = 0;
+    let ytReady = false;
 
-/* ======================
-   YOUTUBE READY
-====================== */
-function onYouTubeIframeAPIReady() {
-  ytReady = true;
-}
-
-/* ======================
-   HELPER
-====================== */
-function getYoutubeId(url) {
-  if (url.includes('youtu.be/'))
-    return url.split('youtu.be/')[1].split('?')[0];
-  if (url.includes('watch?v='))
-    return url.split('watch?v=')[1].split('&')[0];
-  return '';
-}
-
-/* ======================
-   SLIDESHOW
-====================== */
-function startSlideshow() {
-  if (!slides.length) return;
-  document.getElementById('slide').innerHTML =
-    `<img class="slide-img" src="${slides[slideIndex]}">`;
-  slideIndex = (slideIndex + 1) % slides.length;
-  setTimeout(startSlideshow, 4000);
-}
-
-/* ======================
-   VIDEO PLAYER
-====================== */
-function playVideo() {
-  const area = document.getElementById('video');
-  area.innerHTML = '';
-
-  if (!videos.length) {
-    area.innerHTML = "<div style='color:#fff;padding:20px'>Belum ada video</div>";
-    return;
-  }
-
-  const v = videos[videoIndex];
-
-  // YouTube Video
-  if (v.startsWith('http')) {
-    if (!ytReady) {
-      setTimeout(playVideo, 500);
-      return;
+    /* ======================
+       YOUTUBE API READY
+    ====================== */
+    function onYouTubeIframeAPIReady() {
+        ytReady = true;
     }
 
-    area.innerHTML = `<div id="ytplayer"></div>`;
-    player = new YT.Player('ytplayer', {
-      width: '100%',
-      height: '100%',
-      videoId: getYoutubeId(v),
-      playerVars: {
-        autoplay: 1,
-        rel: 0,
-        mute: 0,       // Suara langsung nyala
-        controls: 1
-      },
-      events: {
-        onReady: (e) => {
-          // Autoplay dengan suara jika browser izinkan
-          e.target.playVideo().catch(() => {
-            // Jika browser blok autoplay suara, mute dulu
-            e.target.mute();
-            e.target.playVideo();
-          });
-        },
-        onStateChange: (e) => {
-          if (e.data === YT.PlayerState.ENDED) {
-            nextVideo();
-          }
+    function getYoutubeId(url) {
+        if (url.includes('youtu.be/')) return url.split('youtu.be/')[1].split('?')[0];
+        if (url.includes('watch?v=')) return url.split('watch?v=')[1].split('&')[0];
+        return '';
+    }
+
+    /* ======================
+       SLIDESHOW LOGIC
+    ====================== */
+    function startSlideshow() {
+        if (!slides.length) return;
+        const container = document.getElementById('slide');
+        container.innerHTML = `<img class="slide-img" src="${slides[slideIndex]}" onerror="this.src='https://via.placeholder.com/800x450?text=Gambar+Tidak+Ditemukan'">`;
+        slideIndex = (slideIndex + 1) % slides.length;
+        setTimeout(startSlideshow, 5000);
+    }
+
+    /* ======================
+       VIDEO PLAYER LOGIC
+    ====================== */
+    function playVideo() {
+        const area = document.getElementById('video');
+        area.innerHTML = '';
+
+        if (!videos.length) {
+            area.innerHTML = "<div style='color:#fff;padding:20px'>Belum ada video tersedia.</div>";
+            return;
         }
-      }
-    });
-  } 
-  // MP4 Video
-  else {
-    area.innerHTML = `
-      <video autoplay controls style="width:100%;height:100%" onended="nextVideo()">
-        <source src="/uploads/${v}" type="video/mp4">
-      </video>
-    `;
-    // Pastikan autoplay suara aktif
-    const vid = area.querySelector('video');
-    vid.muted = false;
-    vid.play().catch(() => {
-      vid.muted = true; // fallback jika autoplay diblok
-      vid.play();
-    });
-  }
-}
 
-function nextVideo() {
-  videoIndex = (videoIndex + 1) % videos.length;
-  playVideo();
-}
+        const v = videos[videoIndex];
 
-/* ======================
-   LOAD DATA
-====================== */
-fetch('/api/data')
-  .then(r => r.json())
-  .then(d => {
-    document.getElementById('runningText').innerText = d.runningText || '';
-
-    if (d.slideshow) {
-      slides = d.slideshow.map(s => s.startsWith('http') ? s : '/uploads/' + s);
-      startSlideshow();
+        // Jika YouTube
+        if (v.includes('youtu')) {
+            if (!ytReady) {
+                setTimeout(playVideo, 500);
+                return;
+            }
+            area.innerHTML = `<div id="ytplayer"></div>`;
+            new YT.Player('ytplayer', {
+                width: '100%',
+                height: '100%',
+                videoId: getYoutubeId(v),
+                playerVars: { 'autoplay': 1, 'rel': 0, 'controls': 1 },
+                events: {
+                    'onStateChange': (e) => {
+                        if (e.data === YT.PlayerState.ENDED) {
+                            videoIndex = (videoIndex + 1) % videos.length;
+                            playVideo();
+                        }
+                    }
+                }
+            });
+        } 
+        // Jika file MP4 lokal
+        else {
+            area.innerHTML = `
+                <video autoplay controls style="width:100%;height:100%" onended="nextVideo()">
+                    <source src="${v}" type="video/mp4">
+                </video>`;
+            area.querySelector('video').play().catch(() => {
+                area.querySelector('video').muted = true;
+                area.querySelector('video').play();
+            });
+        }
     }
 
-    videos = d.videoList || [];
-    playVideo();
-  });
-</script>
+    function nextVideo() {
+        videoIndex = (videoIndex + 1) % videos.length;
+        playVideo();
+    }
 
+    /* ======================
+       FETCH DATA FROM data.json
+    ====================== */
+    fetch('data.json')
+        .then(response => {
+            if (!response.ok) throw new Error('data.json tidak ditemukan');
+            return response.json();
+        })
+        .then(data => {
+            // 1. Set Running Text
+            document.getElementById('runningText').innerText = data.runningText || "Selamat Datang";
+
+            // 2. Set Slideshow Images
+            if (data.slideshow && data.slideshow.length > 0) {
+                slides = data.slideshow;
+                startSlideshow();
+            } else {
+                document.getElementById('slide').innerHTML = "Tidak ada foto.";
+            }
+
+            // 3. Set Video List
+            if (data.videoList && data.videoList.length > 0) {
+                videos = data.videoList;
+                playVideo();
+            } else {
+                document.getElementById('video').innerHTML = "Tidak ada video.";
+            }
+        })
+        .catch(err => {
+            console.error("Error:", err);
+            document.getElementById('runningText').innerText = "Gagal memuat data dari data.json";
+        });
+</script>
 
 </body>
 </html>
