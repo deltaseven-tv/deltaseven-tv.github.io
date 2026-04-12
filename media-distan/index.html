@@ -6,7 +6,7 @@
     <title>Dinas Ketahanan Pangan Provinsi Sumatera Utara</title>
 
     <style>
-        body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; color: #333; }
+        body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; color: #333; padding-bottom: 60px; }
 
         /* HEADER */
         .header {
@@ -14,8 +14,8 @@
             padding: 20px; background: #fff; border-bottom: 4px solid #1b5e20;
         }
         .header img { height: 80px; }
-        .header h1 { margin: 0; font-size: 20px; color: #1b5e20; text-transform: uppercase; }
-        .header h2 { margin: 0; font-size: 16px; color: #555; }
+        .header h1 { margin: 0; font-size: 18px; color: #1b5e20; text-transform: uppercase; line-height: 1.2; }
+        .header h2 { margin: 0; font-size: 14px; color: #555; }
 
         /* LAYOUT */
         .wrapper {
@@ -35,7 +35,7 @@
             flex-direction: column;
         }
 
-        .box h3 { margin: 0; padding: 15px; background: #4caf50; color: #fff; font-size: 18px; }
+        .box h3 { margin: 0; padding: 15px; background: #4caf50; color: #fff; font-size: 16px; }
 
         /* SLIDE */
         #slide {
@@ -44,19 +44,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
         .slide-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: opacity 0.5s ease-in-out;
+            animation: fade 1s ease-in-out;
+        }
+
+        @keyframes fade {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
         }
 
         /* VIDEO */
         #video {
             height: 450px;
             background: #000;
+            position: relative;
         }
 
         /* RUNNING TEXT */
@@ -66,11 +73,11 @@
             width: 100%;
             background: #ffd700;
             color: #1b5e20;
-            padding: 12px 0;
+            padding: 10px 0;
             font-weight: bold;
             font-size: 1.1rem;
             border-top: 2px solid #1b5e20;
-            z-index: 100;
+            z-index: 1000;
         }
 
         marquee { display: block; }
@@ -79,7 +86,6 @@
         @media(max-width:900px){
             .wrapper { grid-template-columns: 1fr; padding: 10px; }
             #slide, #video { height: 300px; }
-            .header h1 { font-size: 16px; }
         }
     </style>
 
@@ -109,22 +115,19 @@
 </div>
 
 <div class="footer-marquee">
-    <marquee id="runningText">Memuat informasi...</marquee>
+    <marquee id="runningText">Memuat informasi dinas...</marquee>
 </div>
 
 <script>
-    /* ======================
-       GLOBAL VARIABLES
-    ====================== */
     let slides = [], slideIndex = 0;
     let videos = [], videoIndex = 0;
+    let player;
     let ytReady = false;
 
-    /* ======================
-       YOUTUBE API READY
-    ====================== */
+    // 1. YouTube API Callback
     function onYouTubeIframeAPIReady() {
         ytReady = true;
+        console.log("YouTube API Ready");
     }
 
     function getYoutubeId(url) {
@@ -133,44 +136,46 @@
         return '';
     }
 
-    /* ======================
-       SLIDESHOW LOGIC
-    ====================== */
+    // 2. Slideshow Function
     function startSlideshow() {
         if (!slides.length) return;
         const container = document.getElementById('slide');
-        container.innerHTML = `<img class="slide-img" src="${slides[slideIndex]}" onerror="this.src='https://via.placeholder.com/800x450?text=Gambar+Tidak+Ditemukan'">`;
+        const imgPath = slides[slideIndex].startsWith('http') ? slides[slideIndex] : slides[slideIndex];
+        
+        container.innerHTML = `<img class="slide-img" src="${imgPath}" onerror="this.src='https://via.placeholder.com/800x450?text=Gambar+Tidak+Ditemukan'">`;
+        
         slideIndex = (slideIndex + 1) % slides.length;
         setTimeout(startSlideshow, 5000);
     }
 
-    /* ======================
-       VIDEO PLAYER LOGIC
-    ====================== */
+    // 3. Video Playback Function
     function playVideo() {
         const area = document.getElementById('video');
-        area.innerHTML = '';
-
         if (!videos.length) {
-            area.innerHTML = "<div style='color:#fff;padding:20px'>Belum ada video tersedia.</div>";
+            area.innerHTML = "<div style='color:#fff;padding:20px'>Belum ada video.</div>";
             return;
         }
 
         const v = videos[videoIndex];
 
-        // Jika YouTube
         if (v.includes('youtu')) {
             if (!ytReady) {
-                setTimeout(playVideo, 500);
+                setTimeout(playVideo, 1000);
                 return;
             }
             area.innerHTML = `<div id="ytplayer"></div>`;
-            new YT.Player('ytplayer', {
+            player = new YT.Player('ytplayer', {
                 width: '100%',
                 height: '100%',
                 videoId: getYoutubeId(v),
-                playerVars: { 'autoplay': 1, 'rel': 0, 'controls': 1 },
+                playerVars: { 
+                    'autoplay': 1, 
+                    'mute': 1, // Wajib mute agar autoplay jalan di Chrome/Edge
+                    'rel': 0, 
+                    'controls': 1 
+                },
                 events: {
+                    'onReady': (e) => e.target.playVideo(),
                     'onStateChange': (e) => {
                         if (e.data === YT.PlayerState.ENDED) {
                             videoIndex = (videoIndex + 1) % videos.length;
@@ -179,56 +184,43 @@
                     }
                 }
             });
-        } 
-        // Jika file MP4 lokal
-        else {
-            area.innerHTML = `
-                <video autoplay controls style="width:100%;height:100%" onended="nextVideo()">
-                    <source src="${v}" type="video/mp4">
-                </video>`;
-            area.querySelector('video').play().catch(() => {
-                area.querySelector('video').muted = true;
-                area.querySelector('video').play();
-            });
+        } else {
+            // Untuk file video lokal (MP4)
+            area.innerHTML = `<video id="v-local" autoplay muted controls style="width:100%;height:100%"><source src="${v}" type="video/mp4"></video>`;
+            const vid = document.getElementById('v-local');
+            vid.onended = () => {
+                videoIndex = (videoIndex + 1) % videos.length;
+                playVideo();
+            };
         }
     }
 
-    function nextVideo() {
-        videoIndex = (videoIndex + 1) % videos.length;
-        playVideo();
-    }
-
-    /* ======================
-       FETCH DATA FROM data.json
-    ====================== */
+    // 4. Fetch data.json
+    // Pastikan file ini bernama data.json (huruf kecil) dan sejajar dengan index.html
     fetch('data.json')
-        .then(response => {
-            if (!response.ok) throw new Error('data.json tidak ditemukan');
-            return response.json();
+        .then(res => {
+            if(!res.ok) throw new Error("Gagal load data.json");
+            return res.json();
         })
         .then(data => {
-            // 1. Set Running Text
-            document.getElementById('runningText').innerText = data.runningText || "Selamat Datang";
+            // Set Running Text
+            document.getElementById('runningText').innerText = data.runningText || "Selamat Datang di Dinas Pertanian";
 
-            // 2. Set Slideshow Images
+            // Set Slideshow
             if (data.slideshow && data.slideshow.length > 0) {
                 slides = data.slideshow;
                 startSlideshow();
-            } else {
-                document.getElementById('slide').innerHTML = "Tidak ada foto.";
             }
 
-            // 3. Set Video List
+            // Set Video
             if (data.videoList && data.videoList.length > 0) {
                 videos = data.videoList;
                 playVideo();
-            } else {
-                document.getElementById('video').innerHTML = "Tidak ada video.";
             }
         })
         .catch(err => {
-            console.error("Error:", err);
-            document.getElementById('runningText').innerText = "Gagal memuat data dari data.json";
+            console.error(err);
+            document.getElementById('runningText').innerText = "Gagal memuat data.json. Pastikan file sudah diunggah.";
         });
 </script>
 
