@@ -2,10 +2,63 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Website deltaseven-tv</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>deltaseven-tv | Portofolio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f9; }
+        
+        /* Navigasi */
+        nav { background: #2c3e50; color: #fff; padding: 1rem; text-align: center; position: sticky; top: 0; }
+        nav h1 { font-size: 1.5rem; letter-spacing: 2px; }
+
+        /* Header / Profil */
+        header { background: #fff; padding: 3rem 1rem; text-align: center; border-bottom: 5px solid #3498db; }
+        .profile-img { width: 150px; height: 150px; border-radius: 50%; background: #ddd; margin-bottom: 1rem; object-fit: cover; }
+        header h2 { color: #2c3e50; margin-bottom: 0.5rem; }
+        header p { color: #7f8c8d; font-style: italic; }
+
+        /* Konten Utama */
+        .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        section { background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        h3 { border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 1rem; color: #2c3e50; }
+
+        /* Link & Tombol */
+        .btn { display: inline-block; background: #3498db; color: #fff; padding: 0.7rem 1.5rem; text-decoration: none; border-radius: 5px; transition: 0.3s; }
+        .btn:hover { background: #2980b9; }
+
+        footer { text-align: center; padding: 2rem; color: #95a5a6; font-size: 0.9rem; }
+    </style>
 </head>
 <body>
-    <h1>Halo! Ini adalah situs GitHub Pages pertama saya.</h1>
-    <p>Selamat datang di deltaseven-tv.github.io</p>
+
+    <nav>
+        <h1>DELTASEVEN-TV</h1>
+    </nav>
+
+    <header>
+        <div class="profile-img" style="display: inline-block; line-height: 150px; color: #aaa;">Foto Profil</div>
+        <h2>Halo, Saya deltaseven-tv</h2>
+        <p>Pengembang Web & Kreator Konten Digital</p>
+    </header>
+
+    <div class="container">
+        <section>
+            <h3>Tentang Saya</h3>
+            <p>Selamat datang di situs pribadi saya! Ini adalah tempat di mana saya membagikan hasil karya, proyek pemrograman, dan berbagai informasi menarik lainnya.</p>
+        </section>
+
+        <section>
+            <h3>Proyek Terbaru</h3>
+            <p>Sedang membangun ekosistem digital yang kreatif melalui GitHub Pages.</p>
+            <br>
+            <a href="#" class="btn">Lihat Semua Proyek</a>
+        </section>
+    </div>
+
+    <footer>
+        &copy; 2026 deltaseven-tv. Dibuat dengan GitHub Pages.
+    </footer>
+
 </body>
 </html>
