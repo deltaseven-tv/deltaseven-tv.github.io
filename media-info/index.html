@@ -130,45 +130,60 @@
     function startSlideshowPotret() {
         if (slidesPotret.length === 0) return;
         const container = document.getElementById('slidePotret');
-        container.innerHTML = `<img class="slide-img" src="${slidesPotret[indexPotret]}">`;
+        
+        // Ambil data objek (isinya ada .url dan .ket)
+        const item = slidesPotret[indexPotret];
+        
+        // Render Gambar + Keterangan
+        container.innerHTML = `
+            <img class="slide-img" src="${item.url}">
+            <div class="caption">${item.ket}</div>
+        `;
+        
         indexPotret = (indexPotret + 1) % slidesPotret.length;
-        setTimeout(startSlideshowPotret, 5000); // Ganti setiap 5 detik
+        setTimeout(startSlideshowPotret, 5000); 
     }
 
     // Fungsi Slideshow Lanskap
     function startSlideshowLanskap() {
         if (slidesLanskap.length === 0) return;
         const container = document.getElementById('slideLanskap');
-        container.innerHTML = `<img class="slide-img" src="${slidesLanskap[indexLanskap]}">`;
+        
+        // Ambil data objek (isinya ada .url dan .ket)
+        const item = slidesLanskap[indexLanskap];
+        
+        // Render Gambar + Keterangan
+        container.innerHTML = `
+            <img class="slide-img" src="${item.url}">
+            <div class="caption">${item.ket}</div>
+        `;
+        
         indexLanskap = (indexLanskap + 1) % slidesLanskap.length;
-        setTimeout(startSlideshowLanskap, 7000); // Ganti setiap 7 detik (biar tidak barengan)
+        setTimeout(startSlideshowLanskap, 7000);
     }
 
     // Ambil data dari data.json
     fetch('data.json')
         .then(res => res.json())
         .then(data => {
+            // Update Running Text
             document.getElementById('runningText').innerText = data.runningText;
             
-            // Masukkan data foto dari JSON
-            // Catatan: Pastikan di data.json Anda memiliki array "slideshow" dan "videoList" 
-            // atau ubah nama key di JSON Anda agar sesuai.
-            
-            if (data.slideshow) {
+            // Isi data Potret (slideshow)
+            if (data.slideshow && data.slideshow.length > 0) {
                 slidesPotret = data.slideshow;
                 startSlideshowPotret();
             }
 
-            if (data.videoList) {
-                // Di sini kita gunakan data.videoList sebagai sumber gambar kedua 
-                // (Atau ganti jadi data.slideshowLanskap jika Anda mengubah struktur JSON-nya)
+            // Isi data Lanskap (videoList)
+            if (data.videoList && data.videoList.length > 0) {
                 slidesLanskap = data.videoList; 
                 startSlideshowLanskap();
             }
         })
         .catch(err => {
             console.error("Gagal memuat data.json:", err);
-            document.getElementById('runningText').innerText = "Gagal memuat data.";
+            document.getElementById('runningText').innerText = "Gagal memuat data. Cek format data.json Anda.";
         });
 </script>
 </body>
