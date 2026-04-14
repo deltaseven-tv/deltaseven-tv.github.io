@@ -1,6 +1,24 @@
 {
   "runningText": "Selamat Datang di Portal Informasi Dinas Pertanian dan Ketahanan Pangan Provinsi Sumatera Utara - Terus Tingkatkan Produksi Pangan untuk Kesejahteraan Petani.",
-  "videoList": [],
-  "slideshow": [],
+  "videoList": [
+    {
+      "url": "https://i.ibb.co.com/VYHWcjBL/IMG-3621.jpg",
+      "ket": "Kegiatan Peninjauan Lapangan Pertanian"
+    },
+    {
+      "url": "https://i.ibb.co.com/fYP2CqS4/IMG-3633.jpg",
+      "ket": "Koordinasi Ketahanan Pangan Daerah"
+    }
+  ],
+  "slideshow": [
+    {
+      "url": "https://infosumut.id/wp-content/uploads/2025/04/Panen-Raya-Padi-Serentak-14-Provinsi-1-780x470.jpg",
+      "ket": "Panen Raya Padi Serentak 14 Provinsi"
+    },
+    {
+      "url": "https://i.ibb.co.com/1YHD7frr/IMG-3626.jpg",
+      "ket": "Pendampingan Petani Lokal"
+    }
+  ],
   "berita": []
 }
