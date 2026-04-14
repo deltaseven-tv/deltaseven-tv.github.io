@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Dinas Pertanian</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 10px 20px;
+            border-bottom: 3px solid #2e7d32;
+        }
+        .header img {
+            height: 60px;
+            margin-right: 15px;
+        }
+        .header-text h1 {
+            font-size: 18px;
+            margin: 0;
+            color: #2e7d32;
+            text-transform: uppercase;
+        }
+        .header-text p {
+            font-size: 14px;
+            margin: 0;
+            color: #333;
+        }
+
+        /* CONTAINER UTAMA */
+        .main-container {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            height: 70vh; /* Mengatur tinggi area galeri */
+        }
+
+        /* BOX GALERI */
+        .box {
+            background-color: #ffc107; /* Warna Kuning sesuai gambar */
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .box-title {
+            background-color: #4a76c5; /* Warna Biru sesuai gambar */
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .potret {
+            flex: 1; /* Ukuran lebih kecil (Samping) */
+        }
+
+        .lanskap {
+            flex: 2.5; /* Ukuran lebih lebar */
+        }
+
+        /* RUNNING TEXT */
+        .footer-running {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #4a76c5;
+            color: white;
+            padding: 10px 0;
+        }
+
+        marquee {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="logo.png" alt="Logo Dinas">
+        <div class="header-text">
+            <h1>Dinas Pertanian dan Ketahanan Pangan</h1>
+            <p>Provinsi Sumatera Utara</p>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="box potret">
+            <div class="box-title">Galeri kegiatan (fotoPotret)</div>
+            <div style="flex:1; display:flex; align-items:center; justify-content:center; color:#555;">
+                [Area Foto Potret]
+            </div>
+        </div>
+
+        <div class="box lanskap">
+            <div class="box-title">Galeri kegiatan (foto Lanskap)</div>
+            <div style="flex:1; display:flex; align-items:center; justify-content:center; color:#555;">
+                [Area Foto Lanskap]
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-running">
+        <marquee scrollamount="8">
+            Selamat Datang di Portal Informasi Dinas Pertanian dan Ketahanan Pangan Provinsi Sumatera Utara - Terus Tingkatkan Produksi Pangan untuk Kesejahteraan Petani.
+        </marquee>
+    </div>
+
+</body>
+</html>
