@@ -3,122 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Dinas Pertanian</title>
+    <title>Dinas Pertanian dan ketahanan Pangan Provinsi Sumatera Utara</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-
-        /* HEADER */
-        .header {
-            display: flex;
-            align-items: center;
-            background: white;
-            padding: 10px 20px;
-            border-bottom: 3px solid #2e7d32;
-        }
-        .header img {
-            height: 60px;
-            margin-right: 15px;
-        }
-        .header-text h1 {
-            font-size: 18px;
-            margin: 0;
-            color: #2e7d32;
-            text-transform: uppercase;
-        }
-        .header-text p {
-            font-size: 14px;
-            margin: 0;
-            color: #333;
-        }
-
-        /* CONTAINER UTAMA */
-        .main-container {
-            display: flex;
-            gap: 15px;
-            padding: 15px;
-            height: 70vh; /* Mengatur tinggi area galeri */
-        }
-
-        /* BOX GALERI */
-        .box {
-            background-color: #ffc107; /* Warna Kuning sesuai gambar */
-            border-radius: 15px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #ddd;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .box-title {
-            background-color: #4a76c5; /* Warna Biru sesuai gambar */
-            color: white;
-            text-align: center;
-            padding: 10px;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .potret {
-            flex: 1; /* Ukuran lebih kecil (Samping) */
-        }
-
-        .lanskap {
-            flex: 2.5; /* Ukuran lebih lebar */
-        }
-
-        /* RUNNING TEXT */
-        .footer-running {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #4a76c5;
-            color: white;
-            padding: 10px 0;
-        }
-
-        marquee {
-            font-size: 18px;
-            font-weight: bold;
-        }
+        body { margin: 0; font-family: Arial, sans-serif; background: #f5f5f5; padding-bottom: 50px; }
+        .header { display: flex; align-items: center; padding: 15px 20px; background: #fff; border-bottom: 3px solid #1b5e20; gap: 15px; }
+        .header img { height: 60px; }
+        .header h1 { margin: 0; font-size: 18px; color: #1b5e20; text-transform: uppercase; }
+        .wrapper { display: grid; grid-template-columns: 1fr 2.5fr; gap: 20px; padding: 20px; }
+        .box { background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; }
+        .box h3 { margin: 0; padding: 12px; background: #4caf50; color: #fff; font-size: 16px; }
+        #slide { height: 400px; background: #eee; }
+        .slide-img { width: 100%; height: 100%; object-fit: cover; }
+        #video { height: 400px; background: #000; position: relative; }
+        .footer-marquee { position: fixed; bottom: 0; width: 100%; background: #ffd700; color: #1b5e20; padding: 10px 0; font-weight: bold; z-index: 1000; }
+        @media(max-width: 900px) { .wrapper { grid-template-columns: 1fr; } #slide, #video { height: 300px; } }
     </style>
+    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
 
-    <div class="header">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/d/db/LOGO-PROVINSI-SUMATERA-UTARA.png" alt="Logo Dinas">
-        <div class="header-text">
-            <h1>Dinas Pertanian dan Ketahanan Pangan</h1>
-            <p>Provinsi Sumatera Utara</p>
-        </div>
+<div class="header">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/d/db/LOGO-PROVINSI-SUMATERA-UTARA.png">
+    <div>
+        <h1>Dinas Pertanian dan Ketahanan Pangan</h1>
+        <p style="margin:0; font-size:14px;">Provinsi Sumatera Utara</p>
     </div>
+</div>
 
-    <div class="main-container">
-        <div class="box potret">
-            <div class="box-title">Galeri kegiatan (fotoPotret)</div>
-            <div style="flex:1; display:flex; align-items:center; justify-content:center; color:#555;">
-                [Area Foto Potret]
-            </div>
-        </div>
-
-        <div class="box lanskap">
-            <div class="box-title">Galeri kegiatan (foto Lanskap)</div>
-            <div style="flex:1; display:flex; align-items:center; justify-content:center; color:#555;">
-                [Area Foto Lanskap]
-            </div>
-        </div>
+<div class="wrapper">
+    <div class="box">
+        <h3>Galeri Kegiatan</h3>
+        <div id="slide"></div>
     </div>
-
-    <div class="footer-running">
-        <marquee scrollamount="8">
-            Selamat Datang di Portal Informasi Dinas Pertanian dan Ketahanan Pangan Provinsi Sumatera Utara - Terus Tingkatkan Produksi Pangan untuk Kesejahteraan Petani.
-        </marquee>
+    <div class="box">
+        <h3>Video Profil / Kegiatan</h3>
+        <div id="video"></div>
     </div>
+</div>
 
+<div class="footer-marquee">
+    <marquee id="runningText">Memuat data...</marquee>
+</div>
+
+<script>
+    let slides = [], slideIndex = 0;
+    let videos = [], videoIndex = 0;
+    let player;
+    let ytReady = false;
+
+    // Fungsi API YouTube
+    function onYouTubeIframeAPIReady() {
+        ytReady = true;
+        checkAndStart();
+    }
+
+    function getYoutubeId(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    function checkAndStart() {
+        if (ytReady && videos.length > 0) {
+            playVideo();
+        }
+    }
+
+function playVideo() {
+        const container = document.getElementById('video');
+        const vUrl = videos[videoIndex];
+        const vId = getYoutubeId(vUrl);
+
+        if (!vId) {
+            container.innerHTML = "<p style='color:white; padding:20px;'>ID Video tidak valid</p>";
+            return;
+        }
+
+        container.innerHTML = '<div id="player-elemen"></div>';
+        
+        player = new YT.Player('player-elemen', {
+            width: '100%',
+            height: '100%',
+            videoId: vId,
+            playerVars: {
+                'autoplay': 1,
+                // Video pertama (index 0) wajib mute (1), video selanjutnya bersuara (0)
+                'mute': (videoIndex === 0) ? 1 : 0, 
+                'controls': 1,
+                'rel': 0,
+                'modestbranding': 1
+            },
+            events: {
+                'onReady': (event) => {
+                    event.target.playVideo();
+                    // Jika bukan video pertama, pastikan suara menyala
+                    if (videoIndex > 0) {
+                        event.target.unMute();
+                        event.target.setVolume(80); // Set volume ke 80%
+                    }
+                },
+                'onStateChange': (event) => {
+                    if (event.data === YT.PlayerState.ENDED) {
+                        videoIndex = (videoIndex + 1) % videos.length;
+                        playVideo(); // Putar video berikutnya
+                    }
+                }
+            }
+        });
+    }
+    function startSlideshow() {
+        if (slides.length === 0) return;
+        const container = document.getElementById('slide');
+        container.innerHTML = `<img class="slide-img" src="${slides[slideIndex]}">`;
+        slideIndex = (slideIndex + 1) % slides.length;
+        setTimeout(startSlideshow, 5000);
+    }
+
+    // Ambil data dari data.json
+    fetch('data.json')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('runningText').innerText = data.runningText;
+            
+            // Urus Slideshow
+            if (data.slideshow) {
+                slides = data.slideshow;
+                startSlideshow();
+            }
+
+            // Urus Video
+            if (data.videoList) {
+                videos = data.videoList;
+                checkAndStart();
+            }
+        })
+        .catch(err => {
+            console.error("Gagal memuat data.json:", err);
+            document.getElementById('runningText').innerText = "Gagal memuat data. Periksa file data.json Anda.";
+        });
+</script>
 </body>
 </html>
