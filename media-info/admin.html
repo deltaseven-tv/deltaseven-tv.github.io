@@ -6,25 +6,26 @@
 <style>
     body{ font-family:Segoe UI, Arial, sans-serif; background:#f4f6f8; margin:0; padding: 20px; }
     .container{ max-width:900px; margin:auto; background:#fff; padding:25px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.1); }
-    h2{ color:#2e7d32; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; }
-    h3{ border-left:5px solid #2e7d32; padding-left:10px; margin-top:20px; font-size: 15px; }
+    h2{ color:#1a237e; border-bottom: 2px solid #1a237e; padding-bottom: 10px; }
+    h3{ border-left:5px solid #1a237e; padding-left:10px; margin-top:20px; font-size: 15px; color: #1a237e; }
     input[type=text] { width:100%; padding:10px; margin:5px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
     button{ padding:8px 15px; border:none; border-radius:4px; cursor:pointer; font-weight: bold; }
-    .btn-add{ background:#1976d2; color:#fff; margin-bottom: 10px; }
+    .btn-add{ background:#1976d2; color:#fff; margin-bottom: 10px; width: 100%; }
     .btn-del{ background:#d32f2f; color:#fff; padding: 3px 8px; }
-    .list{ border:1px solid #ddd; padding:10px; background: #fafafa; max-height: 150px; overflow-y: auto; margin-bottom: 10px; border-radius: 4px; }
-    .item{ display:flex; justify-content:space-between; margin-bottom: 5px; font-size: 12px; border-bottom: 1px solid #eee; padding-bottom: 3px; }
+    .list{ border:1px solid #ddd; padding:10px; background: #fafafa; max-height: 200px; overflow-y: auto; margin-bottom: 10px; border-radius: 4px; }
+    .item{ display:flex; justify-content:space-between; align-items: center; margin-bottom: 8px; font-size: 12px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+    .item-info { display: flex; flex-direction: column; gap: 2px; }
+    .item-info b { color: #283593; }
     
-    /* Area Hasil JSON */
     #jsonOutput { width: 100%; height: 200px; margin-top: 20px; font-family: monospace; background: #222; color: #0f0; padding: 10px; box-sizing: border-box; border-radius: 5px; }
-    .copy-box { background: #e8f5e9; padding: 15px; border: 1px dashed #2e7d32; margin-top: 20px; }
+    .copy-box { background: #e8eaf6; padding: 15px; border: 1px dashed #1a237e; margin-top: 20px; }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>ADMIN PANEL (MODAL GITHUB)</h2>
-    <p><small>*Karena di GitHub tidak ada server, silakan edit data di bawah lalu copy kode hijau di bawah ke file <b>data.json</b> Anda.</small></p>
+    <h2>PANEL ADMIN (MODE GITHUB) - TEMA BIRU</h2>
+    <p><small>*Edit data, klik salin, lalu tempel ke file <b>data.json</b> di GitHub.</small></p>
 
     <h3>📢 Teks Berjalan</h3>
     <input type="text" id="rt" oninput="updateJSON()" placeholder="Teks Berjalan...">
@@ -32,35 +33,37 @@
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         <div>
             <h3>📸 Foto Potret (Kiri)</h3>
-            <input type="text" id="inPotret" placeholder="Link foto (https://...)">
-            <button class="btn-add" onclick="tambah('potret')">Tambah</button>
+            <input type="text" id="urlPotret" placeholder="Link foto (https://...)">
+            <input type="text" id="ketPotret" placeholder="Keterangan foto...">
+            <button class="btn-add" onclick="tambah('potret')">Tambah Potret</button>
             <div class="list" id="listPotret"></div>
         </div>
+
         <div>
             <h3>🖼️ Foto Lanskap (Kanan)</h3>
-            <input type="text" id="inLanskap" placeholder="Link foto (https://...)">
-            <button class="btn-add" onclick="tambah('lanskap')">Tambah</button>
+            <input type="text" id="urlLanskap" placeholder="Link foto (https://...)">
+            <input type="text" id="ketLanskap" placeholder="Keterangan foto...">
+            <button class="btn-add" onclick="tambah('lanskap')">Tambah Lanskap</button>
             <div class="list" id="listLanskap"></div>
         </div>
     </div>
 
     <div class="copy-box">
-        <h3>📄 Hasil Kode JSON (Copy & Paste ke data.json di GitHub)</h3>
+        <h3>📄 Hasil Kode JSON (Salin ke data.json)</h3>
         <textarea id="jsonOutput" readonly></textarea>
-        <p><small>Klik tombol di bawah, lalu buka file <b>data.json</b> di GitHub dan ganti isinya dengan ini.</small></p>
-        <button onclick="salinKode()" style="background: #2e7d32; color: white; width: 100%;">SALIN KODE JSON</button>
+        <button onclick="salinKode()" style="background: #1a237e; color: white; width: 100%; margin-top: 10px; padding: 12px;">SALIN KODE JSON</button>
     </div>
 </div>
 
 <script>
 let dataObj = {
-    runningText: "Selamat Datang",
-    videoList: [], // Lanskap
-    slideshow: [], // Potret
+    runningText: "",
+    videoList: [], 
+    slideshow: [], 
     berita: []
 };
 
-// Ambil data lama agar tidak hilang saat edit
+// Ambil data awal
 fetch('data.json')
 .then(r => r.json())
 .then(d => {
@@ -70,27 +73,47 @@ fetch('data.json')
 });
 
 function render() {
-    // Render Potret
+    // Render Potret (slideshow)
     document.getElementById('listPotret').innerHTML = dataObj.slideshow.map((f, i) => `
-        <div class="item"><span>${f.substring(0,30)}...</span> 
-        <button class="btn-del" onclick="hapus('potret',${i})">Hapus</button></div>
-    `).join('');
+        <div class="item">
+            <div class="item-info">
+                <b>${f.ket || 'Tanpa Keterangan'}</b>
+                <small>${f.url.substring(0,30)}...</small>
+            </div>
+            <button class="btn-del" onclick="hapus('potret',${i})">Hapus</button>
+        </div>
+    `).join('') || "<small>Belum ada data</small>";
 
-    // Render Lanskap
+    // Render Lanskap (videoList)
     document.getElementById('listLanskap').innerHTML = dataObj.videoList.map((f, i) => `
-        <div class="item"><span>${f.substring(0,30)}...</span> 
-        <button class="btn-del" onclick="hapus('lanskap',${i})">Hapus</button></div>
-    `).join('');
+        <div class="item">
+            <div class="item-info">
+                <b>${f.ket || 'Tanpa Keterangan'}</b>
+                <small>${f.url.substring(0,30)}...</small>
+            </div>
+            <button class="btn-del" onclick="hapus('lanskap',${i})">Hapus</button>
+        </div>
+    `).join('') || "<small>Belum ada data</small>";
 
     updateJSON();
 }
 
 function tambah(tipe) {
-    let input = document.getElementById(tipe === 'potret' ? 'inPotret' : 'inLanskap');
-    if(!input.value) return;
-    if(tipe === 'potret') dataObj.slideshow.push(input.value);
-    else dataObj.videoList.push(input.value);
-    input.value = "";
+    let urlInput = document.getElementById(tipe === 'potret' ? 'urlPotret' : 'urlLanskap');
+    let ketInput = document.getElementById(tipe === 'potret' ? 'ketPotret' : 'ketLanskap');
+
+    if(!urlInput.value) return alert("Link foto wajib diisi!");
+
+    let itemBaru = {
+        url: urlInput.value.trim(),
+        ket: ketInput.value.trim() || "Kegiatan Dinas"
+    };
+
+    if(tipe === 'potret') dataObj.slideshow.push(itemBaru);
+    else dataObj.videoList.push(itemBaru);
+
+    urlInput.value = "";
+    ketInput.value = "";
     render();
 }
 
@@ -109,7 +132,7 @@ function salinKode() {
     let copyText = document.getElementById("jsonOutput");
     copyText.select();
     document.execCommand("copy");
-    alert("Kode JSON berhasil disalin! Sekarang tempel (Paste) ke file data.json Anda di GitHub.");
+    alert("Kode JSON disalin! Tempel ke file data.json di GitHub Anda.");
 }
 </script>
 
