@@ -18,7 +18,7 @@
             background: #000; 
             color: var(--putih);
             height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* Tetap terkunci di monitor */
         }
 
         .header { 
@@ -37,7 +37,7 @@
 
         .wrapper { 
             display: grid; 
-            grid-template-columns: 1.2fr 2fr; 
+            grid-template-columns: 1.2fr 2fr; /* Layout Desktop Kiri-Kanan */
             gap: 15px; 
             padding: 15px; 
             height: calc(100vh - 125px); 
@@ -80,20 +80,18 @@
             position: relative;
         }
 
-        /* Kode agar foto PENUH (Full) */
         .slide-img, .landscape-img { 
             width: 100%; 
             height: 100%; 
-            object-fit: cover; /* Ini yang membuat foto penuh mengisi kotak */
+            object-fit: cover; 
             object-position: center;
         }
 
-        /* Caption di atas foto agar tidak memakan ruang */
         .caption {
             position: absolute;
             bottom: 0;
             width: 100%;
-            background: rgba(0, 0, 0, 0.7); /* Transparan hitam */
+            background: rgba(0, 0, 0, 0.7); 
             color: var(--kuning-rapi);
             padding: 10px 0;
             text-align: center;
@@ -109,6 +107,36 @@
             height: 45px; display: flex; align-items: center;
             font-weight: bold; z-index: 1000; 
             border-top: 2px solid var(--hitam-rapi); font-size: 18px;
+        }
+
+        /* --- MODE HP (RESPONSIF) --- */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto; /* Izinkan scroll di HP */
+                height: auto;
+            }
+            .wrapper {
+                grid-template-columns: 1fr; /* Jadi 1 kolom (Atas-Bawah) */
+                height: auto;
+                padding-bottom: 60px; /* Ruang agar tidak tertutup teks berjalan */
+            }
+            .header {
+                height: auto;
+                padding: 10px;
+                flex-direction: row;
+                text-align: left;
+            }
+            .header img { height: 40px; }
+            .header h1 { font-size: 14px; }
+            .header p { font-size: 11px; }
+
+            .display-area {
+                height: 250px; /* Tentukan tinggi kotak foto di HP */
+            }
+            .footer-marquee {
+                font-size: 14px;
+                height: 35px;
+            }
         }
     </style>
 </head>
@@ -135,7 +163,7 @@
 </div>
 
 <div class="footer-marquee">
-    <marquee id="runningText" scrollamount="8">Memuat informasi...</marquee>
+    <marquee id="runningText" scrollamount="6">Memuat informasi...</marquee>
 </div>
 
 <script>
