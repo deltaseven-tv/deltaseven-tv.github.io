@@ -1,1 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAPI Lokal Camar 02.01.03 Kota Medan</title>
+    <style>
+        :root {
+            --hijau-rapi: #1b5e20;
+            --kuning-rapi: #ffd700;
+            --hitam-rapi: #1a1a1a;
+            --putih: #ffffff;
+        }
 
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: #000; 
+            color: var(--putih);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header { 
+            display: flex; 
+            align-items: center; 
+            padding: 10px 20px; 
+            background: var(--putih); 
+            border-bottom: 4px solid var(--hijau-rapi); 
+            gap: 15px;
+            height: 80px;
+            box-sizing: border-box;
+        }
+        .header img { height: 60px; }
+        .header h1 { margin: 0; font-size: 18px; color: var(--hitam-rapi); font-weight: 800; text-transform: uppercase; }
+        .header p { margin: 0; font-size: 13px; color: var(--hijau-rapi); font-weight: bold; }
+
+        .wrapper { 
+            display: grid; 
+            grid-template-columns: 1.2fr 2fr; 
+            gap: 15px; 
+            padding: 15px; 
+            height: calc(100vh - 125px); 
+            box-sizing: border-box;
+        }
+
+        .box { 
+            background: #1a1a1a; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column;
+            border: 1px solid #333;
+        }
+        
+        .box h3 { 
+            margin: 0; padding: 10px; 
+            background: var(--hijau-rapi); color: var(--kuning-rapi); 
+            font-size: 14px; text-transform: uppercase; text-align: center;
+        }
+
+        .display-area { 
+            flex-grow: 1;
+            background: #000; 
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Kode agar foto PENUH (Full) */
+        .slide-img, .landscape-img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; /* Ini yang membuat foto penuh mengisi kotak */
+            object-position: center;
+        }
+
+        /* Caption di atas foto agar tidak memakan ruang */
+        .caption {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7); /* Transparan hitam */
+            color: var(--kuning-rapi);
+            padding: 10px 0;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-top: 1px solid var(--hijau-rapi);
+        }
+
+        .footer-marquee { 
+            position: fixed; bottom: 0; width: 100%; 
+            background: var(--kuning-rapi); color: var(--hijau-rapi); 
+            height: 45px; display: flex; align-items: center;
+            font-weight: bold; z-index: 1000; 
+            border-top: 2px solid var(--hitam-rapi); font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <img src="https://i.ibb.co.com/JRj9XzDs/Logo-Rapi.png" alt="Logo RAPI">
+    <div>
+        <h1>RADIO ANTAR PENDUDUK INDONESIA</h1>
+        <p>020103 LOKAL CAMAR KOTA MEDAN - SUMATERA UTARA</p>
+    </div>
+</div>
+
+<div class="wrapper">
+    <div class="box">
+        <h3>Galeri Lokal Camar</h3>
+        <div id="slidePotret" class="display-area"></div>
+    </div>
+    
+    <div class="box">
+        <h3>Foto Kegiatan Utama</h3>
+        <div id="slideLanskap" class="display-area"></div>
+    </div>
+</div>
+
+<div class="footer-marquee">
+    <marquee id="runningText" scrollamount="8">Memuat informasi...</marquee>
+</div>
+
+<script>
+    let potretData = [], potretIndex = 0;
+    let lanskapData = [], lanskapIndex = 0;
+
+    function startPotret() {
+        if (potretData.length === 0) return;
+        const container = document.getElementById('slidePotret');
+        const item = potretData[potretIndex];
+        const url = typeof item === 'object' ? item.url : item;
+        const ket = typeof item === 'object' ? item.ket : "Kegiatan RAPI";
+
+        container.innerHTML = `
+            <div class="image-container">
+                <img class="slide-img" src="${url}">
+                <div class="caption">${ket}</div>
+            </div>
+        `;
+        potretIndex = (potretIndex + 1) % potretData.length;
+        setTimeout(startPotret, 5000);
+    }
+
+    function startLanskap() {
+        if (lanskapData.length === 0) return;
+        const container = document.getElementById('slideLanskap');
+        const item = lanskapData[lanskapIndex];
+        const url = typeof item === 'object' ? item.url : item;
+        const ket = typeof item === 'object' ? item.ket : "Dokumentasi Lokal Camar";
+
+        container.innerHTML = `
+            <div class="image-container">
+                <img class="landscape-img" src="${url}">
+                <div class="caption">${ket}</div>
+            </div>
+        `;
+        lanskapIndex = (lanskapIndex + 1) % lanskapData.length;
+        setTimeout(startLanskap, 7000);
+    }
+
+    fetch('data.json')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('runningText').innerText = data.runningText;
+            if (data.slideshow) { potretData = data.slideshow; startPotret(); }
+            if (data.videoList) { lanskapData = data.videoList; startLanskap(); }
+        });
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Admin RAPI Lokal Camar - GitHub Mode</title>
+<style>
+    :root {
+        --hijau-rapi: #1b5e20;
+        --kuning-rapi: #ffd700;
+        --hitam-rapi: #1a1a1a;
+    }
+    body{ font-family:'Segoe UI', Arial, sans-serif; background:#f4f6f8; margin:0; padding: 20px; }
+    .container{ max-width:950px; margin:auto; background:#fff; padding:25px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,.1); }
+    h2{ color: var(--hijau-rapi); border-bottom: 2px solid var(--hijau-rapi); padding-bottom: 10px; text-transform: uppercase; }
+    h3{ border-left:5px solid var(--hijau-rapi); padding-left:10px; margin-top:20px; font-size: 15px; color: var(--hijau-rapi); text-transform: uppercase; }
+    
+    input[type=text] { width:100%; padding:10px; margin:5px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    
+    button{ padding:8px 15px; border:none; border-radius:4px; cursor:pointer; font-weight: bold; transition: 0.2s; }
+    .btn-add{ background: var(--hijau-rapi); color: var(--kuning-rapi); margin-bottom: 10px; width: 100%; }
+    .btn-add:hover { background: #2e7d32; }
+    
+    .btn-del{ background:#d32f2f; color:#fff; padding: 3px 8px; font-size: 11px; }
+    .list{ border:1px solid #ddd; padding:10px; background: #fafafa; max-height: 200px; overflow-y: auto; margin-bottom: 10px; border-radius: 4px; }
+    
+    .item{ display:flex; justify-content:space-between; align-items: center; margin-bottom: 8px; font-size: 12px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+    .item-info { display: flex; flex-direction: column; gap: 2px; }
+    .item-info b { color: var(--hijau-rapi); }
+    
+    #jsonOutput { width: 100%; height: 200px; margin-top: 20px; font-family: monospace; background: #222; color: #0f0; padding: 10px; box-sizing: border-box; border-radius: 5px; font-size: 12px; }
+    .copy-box { background: #e8eaf6; padding: 15px; border: 1px dashed var(--hijau-rapi); margin-top: 20px; border-radius: 8px; }
+    .logo-header { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-header">
+        <img src="https://i.ibb.co.com/JRj9XzDs/Logo-Rapi.png" height="50">
+        <h2>PANEL ADMIN RAPI LOKAL CAMAR</h2>
+    </div>
+    <p><small>*Edit data, klik salin, lalu tempel ke file <b>data.json</b> di GitHub Anda.</small></p>
+
+    <h3>📢 Teks Berjalan (Running Text)</h3>
+    <input type="text" id="rt" oninput="updateJSON()" placeholder="Teks Berjalan...">
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+            <h3>📸 Foto Potret (Galeri Kiri)</h3>
+            <input type="text" id="urlPotret" placeholder="Link foto (https://...)">
+            <input type="text" id="ketPotret" placeholder="Keterangan foto...">
+            <button class="btn-add" onclick="tambah('potret')">TAMBAH KE GALERI</button>
+            <div class="list" id="listPotret"></div>
+        </div>
+
+        <div>
+            <h3>🖼️ Foto Lanskap (Kegiatan Kanan)</h3>
+            <input type="text" id="urlLanskap" placeholder="Link foto (https://...)">
+            <input type="text" id="ketLanskap" placeholder="Keterangan foto...">
+            <button class="btn-add" onclick="tambah('lanskap')">TAMBAH KE KEGIATAN</button>
+            <div class="list" id="listLanskap"></div>
+        </div>
+    </div>
+
+    <div class="copy-box">
+        <h3>📄 Hasil Kode JSON (Salin ke data.json)</h3>
+        <textarea id="jsonOutput" readonly></textarea>
+        <button onclick="salinKode()" style="background: var(--hijau-rapi); color: var(--kuning-rapi); width: 100%; margin-top: 10px; padding: 12px; font-size: 16px;">SALIN KODE JSON</button>
+    </div>
+</div>
+
+<script>
+let dataObj = {
+    runningText: "",
+    slideshow: [], // Untuk Potret
+    videoList: []  // Untuk Lanskap (sesuai variabel index.html)
+};
+
+// Ambil data awal dari GitHub/Local
+fetch('data.json')
+.then(r => r.json())
+.then(d => {
+    dataObj = d;
+    document.getElementById('rt').value = d.runningText || "";
+    render();
+})
+.catch(e => {
+    console.log("Memulai dengan data baru");
+    render();
+});
+
+function render() {
+    // Render Potret
+    document.getElementById('listPotret').innerHTML = dataObj.slideshow.map((f, i) => `
+        <div class="item">
+            <div class="item-info">
+                <b>${f.ket || 'Tanpa Keterangan'}</b>
+                <small>${f.url.substring(0,35)}...</small>
+            </div>
+            <button class="btn-del" onclick="hapus('potret',${i})">Hapus</button>
+        </div>
+    `).join('') || "<small>Belum ada data galeri</small>";
+
+    // Render Lanskap
+    document.getElementById('listLanskap').innerHTML = dataObj.videoList.map((f, i) => `
+        <div class="item">
+            <div class="item-info">
+                <b>${f.ket || 'Tanpa Keterangan'}</b>
+                <small>${f.url.substring(0,35)}...</small>
+            </div>
+            <button class="btn-del" onclick="hapus('lanskap',${i})">Hapus</button>
+        </div>
+    `).join('') || "<small>Belum ada data kegiatan</small>";
+
+    updateJSON();
+}
+
+function tambah(tipe) {
+    let urlInput = document.getElementById(tipe === 'potret' ? 'urlPotret' : 'urlLanskap');
+    let ketInput = document.getElementById(tipe === 'potret' ? 'ketPotret' : 'ketLanskap');
+
+    if(!urlInput.value) return alert("Link foto wajib diisi!");
+
+    let itemBaru = {
+        url: urlInput.value.trim(),
+        ket: ketInput.value.trim() || "Kegiatan RAPI"
+    };
+
+    if(tipe === 'potret') dataObj.slideshow.push(itemBaru);
+    else dataObj.videoList.push(itemBaru);
+
+    urlInput.value = "";
+    ketInput.value = "";
+    render();
+}
+
+function hapus(tipe, i) {
+    if(tipe === 'potret') dataObj.slideshow.splice(i, 1);
+    else dataObj.videoList.splice(i, 1);
+    render();
+}
+
+function updateJSON() {
+    dataObj.runningText = document.getElementById('rt').value;
+    document.getElementById('jsonOutput').value = JSON.stringify(dataObj, null, 2);
+}
+
+function salinKode() {
+    let copyText = document.getElementById("jsonOutput");
+    copyText.select();
+    document.execCommand("copy");
+    alert("Kode JSON disalin!\n\nSekarang buka file data.json di GitHub, hapus isinya, lalu Tempel (Paste).");
+}
+</script>
+
+</body>
+</html>
